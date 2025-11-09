@@ -1,0 +1,15 @@
+# config/settings.yaml
+spark:
+  app_name: "Analise de Pedidos"
+
+paths:
+  pagamentos: "data/input/pagamentos"
+  pedidos: "data/input/pedidos"
+  output: "data/output/relatorio"
+
+file_options:
+ pedidos_csv:
+    compression: "gzip"
+    header: True
+    sep: ";"
+
