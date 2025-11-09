@@ -2,6 +2,8 @@ from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.functions import col
 from config.settings import carregar_config
+from session.spark_session import SparkSessionManager
+from io_utils.data_handler import DataHandler
 from pyspark.sql.types import (
     StructType, StructField, StringType, DoubleType, BooleanType, 
     TimestampType, LongType
@@ -9,8 +11,11 @@ from pyspark.sql.types import (
 
 config = carregar_config()
 app_name = config['spark']['app_name']
+spark = SparkSessionManager.get_spark_session(app_name=app_name)
 path_pagamentos = config['paths']['pagamentos']
-
+path_pedidos = config['paths']['pedidos']
+output_path = config['paths']['output']
+dh = DataHandler(spark)
  
 # Spark
 print("Abrindo a sessao spark")
@@ -25,26 +30,8 @@ spark = SparkSession.builder.appName(app_name).getOrCreate()
 # ========================
 # PAGAMENTOS
 # ========================
- 
-# Schema para pagamentos
-schema_pagamentos = StructType([
-    StructField("id_pedido", StringType(), True),
-    StructField("forma_pagamento", StringType(), True),
-    StructField("valor_pagamento", DoubleType(), True),
-    StructField("status", BooleanType(), True),
-    StructField("data_processamento", TimestampType(), True),
-    StructField(
-        "avaliacao_fraude",
-        StructType([
-            StructField("fraude", BooleanType(), True),
-            StructField("score", DoubleType(), True)
-        ]),
-        True
-    )   
-])
- 
 print("Abrindo o dataframe de pagamentos usando schema manual")
-df_pagamentos = spark.read.option("compression", "gzip").json(path_pagamentos, schema=schema_pagamentos)
+df_pagamentos = dh.load_pagamentos(path = path_pagamentos)
 
  
 # Flatten
@@ -62,24 +49,14 @@ df_pagamentos.printSchema()
 # ========================
 # PEDIDOS
 # ========================
- 
- 
-# Schema para pedidos
-schema_pedidos = StructType([
-    StructField("ID_PEDIDO", StringType(), True),
-    StructField("PRODUTO", StringType(), True),
-    StructField("VALOR_UNITARIO", DoubleType(), True),
-    StructField("QUANTIDADE", LongType(), True),
-    StructField("DATA_CRIACAO", TimestampType(), True),
-    StructField("UF", StringType(), True),
-    StructField("ID_CLIENTE", LongType(), True)
-])
- 
 print("Abrindo o dataframe de pedidos")
-df_pedidos = (
-    spark.read
-         .csv(f"{PEDIDOS_PATH}/*.csv.gz", header=True, schema = schema_pedidos, sep=";")
-)
+
+compression_pedidos = config['file_options']['pedidos_csv']['compression']
+header_pedidos = config['file_options']['pedidos_csv']['header']
+separator_pedidos = config['file_options']['pedidos_csv']['sep']
+df_pedidos = dh.load_pedidos(path = path_pedidos, compression=compression_pedidos, header=header_pedidos, sep=separator_pedidos)
+df_pedidos.show()
+
  ## Adicionando no relatório o valor total do pedido 
 df_pedidos = df_pedidos.withColumn("VALOR_TOTAL", col("VALOR_UNITARIO") * col("QUANTIDADE"))
 df_pedidos.show()
@@ -125,6 +102,5 @@ df_relatorio.show()
  
 ## salva em parquet
 print("Salvando em parquet")
-df_relatorio.write.mode("overwrite").parquet(OUTPUT_PATH)
-
+dh.write_parquet(df=df_relatorio, path=output_path)
 
