@@ -1,0 +1,30 @@
+2025-11-16 19:38:24 - root - INFO - Logging configurado.
+2025-11-16 19:38:29 - pipeline.pipeline - INFO - Pipeline iniciado...
+2025-11-16 19:38:29 - pipeline.pipeline - INFO - Abrindo o dataframe de pagamentos
+2025-11-16 19:38:33 - pipeline.pipeline - INFO - Abrindo o dataframe de pedidos
+2025-11-16 19:38:33 - pipeline.pipeline - INFO - Avaliando Fraude
+2025-11-16 19:38:33 - pipeline.pipeline - INFO - Adicionando no relatório o valor total do pedido
+2025-11-16 19:38:34 - pipeline.pipeline - INFO - Filtrando Pagamentos
+2025-11-16 19:38:34 - pipeline.pipeline - INFO - Filtrando Pedidos
+2025-11-16 19:38:35 - pipeline.pipeline - INFO - Fazendo a junção dos dataframes
+2025-11-16 19:38:37 - pipeline.pipeline - INFO - Ordena Resultado
+2025-11-16 19:38:38 - pipeline.pipeline - INFO - Escrevendo o resultado em parquet
+2025-11-16 19:38:41 - io_utils.data_handler - INFO - Dados salvos com sucesso em: data/output/relatorio
+2025-11-16 19:38:41 - pipeline.pipeline - ERROR - Problemas ao escrever o arquivo em parquet: local variable 'e' referenced before assignment
+2025-11-16 19:38:41 - root - INFO - Sessão Spark finalizada.
+2025-11-16 19:38:41 - py4j.clientserver - INFO - Closing down clientserver connection
+2025-11-16 19:57:09 - root - INFO - Logging configurado.
+2025-11-16 19:57:14 - pipeline.pipeline - INFO - Pipeline iniciado...
+2025-11-16 19:57:14 - pipeline.pipeline - INFO - Abrindo o dataframe de pagamentos
+2025-11-16 19:57:18 - pipeline.pipeline - INFO - Abrindo o dataframe de pedidos
+2025-11-16 19:57:18 - pipeline.pipeline - INFO - Avaliando Fraude
+2025-11-16 19:57:19 - pipeline.pipeline - INFO - Adicionando no relatório o valor total do pedido
+2025-11-16 19:57:19 - pipeline.pipeline - INFO - Filtrando Pagamentos
+2025-11-16 19:57:20 - pipeline.pipeline - INFO - Filtrando Pedidos
+2025-11-16 19:57:20 - pipeline.pipeline - INFO - Fazendo a junção dos dataframes
+2025-11-16 19:57:22 - pipeline.pipeline - INFO - Ordena Resultado
+2025-11-16 19:57:24 - pipeline.pipeline - INFO - Escrevendo o resultado em parquet
+2025-11-16 19:57:27 - io_utils.data_handler - INFO - Dados salvos com sucesso em: data/output/relatorio
+2025-11-16 19:57:27 - pipeline.pipeline - ERROR - Problemas ao escrever o arquivo em parquet: local variable 'e' referenced before assignment
+2025-11-16 19:57:28 - root - INFO - Sessão Spark finalizada.
+2025-11-16 19:57:28 - py4j.clientserver - INFO - Closing down clientserver connection
