@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV /home/ubuntu/environment/lab-trabalho-data-eng-prog/.venv
+set -gx VIRTUAL_ENV /home/ubuntu/environment/teste_git/aws-cloud9-trabalho/.venv
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/"bin $PATH

@@ -1,4 +1,4 @@
-#!/home/ubuntu/environment/lab-trabalho-data-eng-prog/.venv/bin/python3
+#!/home/ubuntu/environment/teste_git/aws-cloud9-trabalho/.venv/bin/python3
 
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more

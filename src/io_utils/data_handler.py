@@ -72,8 +72,11 @@ class DataHandler:
         except AnalysisException as e:
             if "PATH_NOT_FOUND" in str(e):
                 logger.error(f"Arquivo não encontrado: {path}")
-
-        raise Exception(f"Erro ao carregar pagamentos: {e}")
+            logger.error(f"Erro Spark ao carregar pagamentos: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Erro inesperado ao carregar pagamentos: {e}")
+            raise
 
     def load_pedidos(
         self, path: str, compression: str, header: bool, sep: str
@@ -87,13 +90,15 @@ class DataHandler:
         except AnalysisException as e:
             if "PATH_NOT_FOUND" in str(e):
                 logger.error(f"Arquivo não encontrado: {path}")
-
-        raise Exception(f"Erro ao carregar pedidos: {e}")
+            logger.error(f"Erro Spark ao carregar pedidos: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Erro inesperado ao carregar pedidos: {e}")
+            raise
 
     def write_parquet(self, df: DataFrame, path: str):
         """
         Salva o DataFrame em formato Parquet, sobrescrevendo se já existir.
-
         :param df: DataFrame a ser salvo.
         :param path: Caminho de destino.
         """
@@ -102,6 +107,9 @@ class DataHandler:
             logger.info(f"Dados salvos com sucesso em: {path}")
         except AnalysisException as e:
             if "PATH_NOT_FOUND" in str(e):
-                logger.error(f"Arquivo não salvo: {path}")
-
-        raise Exception(f"Erro ao salvar arquivo: {e}")
+                logger.error(f"Caminho não encontrado: {path}")
+            logger.error(f"Erro Spark ao salvar parquet: {e}")
+            raise 
+        except Exception as e:
+            logger.error(f"Erro inesperado ao salvar parquet: {e}")
+            raise 

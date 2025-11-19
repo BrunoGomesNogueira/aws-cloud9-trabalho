@@ -38,7 +38,6 @@ def main():
     # 1. Inicialização da sessão Spark
     spark = None
     try:
-        # 1. Inicialização da sessão Spark
         spark = SparkSessionManager.get_spark_session(app_name=app_name)
 
         # 2. Injeção de Dependência e Execução
