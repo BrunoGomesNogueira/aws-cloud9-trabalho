@@ -18,24 +18,18 @@ class Transformation:
         )
 
     def add_valor_total_pedidos(self, df_pedidos: DataFrame) -> DataFrame:
-        return df_pedidos.withColumn(
-            "VALOR_TOTAL", F.col("VALOR_UNITARIO") * F.col("QUANTIDADE")
-        )
+        return df_pedidos.withColumn("VALOR_TOTAL", F.col("VALOR_UNITARIO") * F.col("QUANTIDADE"))
 
     def filtra_pagamentos(self, df_pagamentos: DataFrame) -> DataFrame:
-        return df_pagamentos.filter(
-            (F.col("status") == False) & (F.col("fraude") == False)
-        )
+        return df_pagamentos.filter((F.col("status") == False) & (F.col("fraude") == False))
 
     def filtra_pedidos(self, df_pedidos_filtrado: DataFrame) -> DataFrame:
         return df_pedidos_filtrado.filter((F.year(F.col("DATA_CRIACAO")) == 2025))
 
-    def join_pagamentos_pedidos(
-        self, df_pagamento_filtrado: DataFrame, df_pedidos_filtrado: DataFrame
-    ) -> DataFrame:
-        return df_pagamento_filtrado.join(
-            df_pedidos_filtrado, on="ID_PEDIDO", how="inner"
-        ).select("id_pedido", "UF", "forma_pagamento", "VALOR_UNITARIO", "DATA_CRIACAO")
+    def join_pagamentos_pedidos(self, df_pagamento_filtrado: DataFrame, df_pedidos_filtrado: DataFrame) -> DataFrame:
+        return df_pagamento_filtrado.join(df_pedidos_filtrado, on="ID_PEDIDO", how="inner").select(
+            "id_pedido", "UF", "forma_pagamento", "VALOR_UNITARIO", "DATA_CRIACAO"
+        )
 
     def ordenar(self, df_relatorio: DataFrame) -> DataFrame:
         return df_relatorio.orderBy(

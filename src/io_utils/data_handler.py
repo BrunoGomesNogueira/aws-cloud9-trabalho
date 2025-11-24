@@ -66,9 +66,7 @@ class DataHandler:
         """Carrega o dataframe de pagamentos a partir de um arquivo JSON."""
         schema = self._get_schema_pagamentos()
         try:
-            return self.spark.read.option("compression", "gzip").json(
-                path, schema=schema
-            )
+            return self.spark.read.option("compression", "gzip").json(path, schema=schema)
         except AnalysisException as e:
             if "PATH_NOT_FOUND" in str(e):
                 logger.error(f"Arquivo não encontrado: {path}")
@@ -78,15 +76,11 @@ class DataHandler:
             logger.error(f"Erro inesperado ao carregar pagamentos: {e}")
             raise
 
-    def load_pedidos(
-        self, path: str, compression: str, header: bool, sep: str
-    ) -> DataFrame:
+    def load_pedidos(self, path: str, compression: str, header: bool, sep: str) -> DataFrame:
         """Carrega o dataframe de pedidos a partir de um arquivo CSV."""
         schema = self._get_schema_pedidos()
         try:
-            return self.spark.read.option("compression", compression).csv(
-                path, header=header, schema=schema, sep=sep
-            )
+            return self.spark.read.option("compression", compression).csv(path, header=header, schema=schema, sep=sep)
         except AnalysisException as e:
             if "PATH_NOT_FOUND" in str(e):
                 logger.error(f"Arquivo não encontrado: {path}")
@@ -109,7 +103,7 @@ class DataHandler:
             if "PATH_NOT_FOUND" in str(e):
                 logger.error(f"Caminho não encontrado: {path}")
             logger.error(f"Erro Spark ao salvar parquet: {e}")
-            raise 
+            raise
         except Exception as e:
             logger.error(f"Erro inesperado ao salvar parquet: {e}")
-            raise 
+            raise

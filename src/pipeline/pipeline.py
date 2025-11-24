@@ -70,9 +70,7 @@ class Pipeline:
 
         logger.info("Filtrando Pagamentos")
         try:
-            df_filtra_pagamento = self.transformer.filtra_pagamentos(
-                df_pagamentos_fraude
-            )
+            df_filtra_pagamento = self.transformer.filtra_pagamentos(df_pagamentos_fraude)
         except Exception as e:
             logger.error(f"Problemas ao carregar dados de pagamentos filtrados: {e}")
             return  # Interrompe o pipeline se os pedidos não puderem ser carregados
@@ -90,9 +88,7 @@ class Pipeline:
 
         logger.info("Fazendo a junção dos dataframes")
         try:
-            resultado_final_df = self.transformer.join_pagamentos_pedidos(
-                df_filtra_pagamento, df_filtra_pedidos
-            )
+            resultado_final_df = self.transformer.join_pagamentos_pedidos(df_filtra_pagamento, df_filtra_pedidos)
         except Exception as e:
             logger.error(f"Problemas ao carregar dados finais: {e}")
             return  # Interrompe o pipeline se os pedidos não puderem ser carregados
