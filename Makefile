@@ -30,5 +30,5 @@ run:
 
 format:
 	@echo "✨ Formatando código..."
-	python -m black src/ tests/ --line-length=120
+	python -m black src/ tests/
 	@echo "✅ Formatação concluída!"

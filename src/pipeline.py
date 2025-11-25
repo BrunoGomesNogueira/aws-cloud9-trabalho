@@ -1,11 +1,11 @@
-# src/pipeline/pipeline.py
-import logging
+# src/pipeline.py
 from pyspark.sql import SparkSession
-from io_utils.data_handler import DataHandler
-from processing.transformations import Transformation
-import config.settings as settings
+from core.logger import get_logger
+from core.config import Settings
+from data.handlers import DataHandler
+from data.transformations import Transformation
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class Pipeline:
@@ -18,14 +18,17 @@ class Pipeline:
         self.data_handler = DataHandler(self.spark)
         self.transformer = Transformation()
 
-    def run(self, config):
+    def run(self, config: Settings) -> None:
         """
         Executa o pipeline completo: carga, transformação, e salvamento.
+
+        Args:
+            config: Objeto Settings com todas as configurações do pipeline.
         """
         logger.info("Pipeline iniciado...")
 
         logger.info("Abrindo o dataframe de pagamentos")
-        path_pagamentos = config["paths"]["pagamentos"]
+        path_pagamentos = config.paths.pagamentos
         try:
             df_pagamentos = self.data_handler.load_pagamentos(path=path_pagamentos)
         except Exception as e:
@@ -35,10 +38,10 @@ class Pipeline:
         df_pagamentos.show(5, truncate=False)
 
         logger.info("Abrindo o dataframe de pedidos")
-        path_pedidos = config["paths"]["pedidos"]
-        compression_pedidos = config["file_options"]["pedidos_csv"]["compression"]
-        header_pedidos = config["file_options"]["pedidos_csv"]["header"]
-        separator_pedidos = config["file_options"]["pedidos_csv"]["sep"]
+        path_pedidos = config.paths.pedidos
+        compression_pedidos = config.file_options.pedidos_csv.compression
+        header_pedidos = config.file_options.pedidos_csv.header
+        separator_pedidos = config.file_options.pedidos_csv.sep
         try:
             df_pedidos = self.data_handler.load_pedidos(
                 path=path_pedidos,
@@ -70,7 +73,7 @@ class Pipeline:
 
         logger.info("Filtrando Pagamentos")
         try:
-            df_filtra_pagamento = self.transformer.filtra_pagamentos(df_pagamentos_fraude)
+            df_filtra_pagamento = self.transformer.filtra_pagamentos_aprovados_sem_fraude(df_pagamentos_fraude)
         except Exception as e:
             logger.error(f"Problemas ao carregar dados de pagamentos filtrados: {e}")
             return  # Interrompe o pipeline se os pedidos não puderem ser carregados
@@ -79,7 +82,7 @@ class Pipeline:
 
         logger.info("Filtrando Pedidos")
         try:
-            df_filtra_pedidos = self.transformer.filtra_pedidos(df_pedidos)
+            df_filtra_pedidos = self.transformer.filtra_pedidos_2025(df_pedidos)
         except Exception as e:
             logger.error(f"Problemas ao carregar dados de pedidos filtrados: {e}")
             return  # Interrompe o pipeline se os pedidos não puderem ser carregados
@@ -97,7 +100,7 @@ class Pipeline:
 
         logger.info("Ordena Resultado")
         try:
-            ordena_df = self.transformer.ordenar(resultado_final_df)
+            ordena_df = self.transformer.ordenar_por_uf_forma_pagamento_data_criacao(resultado_final_df)
         except Exception as e:
             logger.error(f"Problemas ao carregar dados de resultado: {e}")
             return  # Interrompe o pipeline se os pedidos não puderem ser carregados
@@ -106,7 +109,7 @@ class Pipeline:
 
         logger.info("Escrevendo o resultado em parquet")
         try:
-            path_output = config["paths"]["output"]
+            path_output = config.paths.output
             self.data_handler.write_parquet(df=resultado_final_df, path=path_output)
         except Exception as e:
             logger.error(f"Problemas ao escrever o arquivo em parquet: {e}")

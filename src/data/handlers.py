@@ -1,5 +1,5 @@
-# src/io_utils/data_handler.py
-import logging
+# src/data/handlers.py
+from core.logger import get_logger
 from pyspark.errors import AnalysisException
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.types import (
@@ -15,7 +15,7 @@ from pyspark.sql.types import (
     TimestampType,
 )
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class DataHandler:
