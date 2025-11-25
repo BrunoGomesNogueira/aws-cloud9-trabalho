@@ -19,7 +19,6 @@ from pyspark.sql.types import (
 )
 from src.data.transformations import Transformation
 
-
 # ==================== Spark Session ====================
 
 
@@ -28,12 +27,11 @@ def spark_session():
     """
     Cria uma SparkSession para ser usada em todos os testes.
     A sessão é finalizada automaticamente ao final da execução dos testes.
-    
+
     Scope: session - compartilhada entre todos os testes
     """
     spark = (
-        SparkSession.builder
-        .appName("PySpark Unit Tests")
+        SparkSession.builder.appName("PySpark Unit Tests")
         .master("local[*]")
         .config("spark.sql.shuffle.partitions", "2")  # Otimização para testes
         .getOrCreate()
@@ -49,7 +47,7 @@ def spark_session():
 def transformer():
     """
     Retorna uma instância de Transformation para os testes.
-    
+
     Scope: function - nova instância para cada teste
     """
     return Transformation()
@@ -61,41 +59,53 @@ def transformer():
 @pytest.fixture
 def schema_pedidos():
     """Schema para DataFrame de pedidos."""
-    return StructType([
-        StructField("ID_PEDIDO", StringType(), True),
-        StructField("PRODUTO", StringType(), True),
-        StructField("VALOR_UNITARIO", DoubleType(), True),
-        StructField("QUANTIDADE", LongType(), True),
-        StructField("DATA_CRIACAO", TimestampType(), True),
-        StructField("UF", StringType(), True),
-        StructField("ID_CLIENTE", LongType(), True),
-    ])
+    return StructType(
+        [
+            StructField("ID_PEDIDO", StringType(), True),
+            StructField("PRODUTO", StringType(), True),
+            StructField("VALOR_UNITARIO", DoubleType(), True),
+            StructField("QUANTIDADE", LongType(), True),
+            StructField("DATA_CRIACAO", TimestampType(), True),
+            StructField("UF", StringType(), True),
+            StructField("ID_CLIENTE", LongType(), True),
+        ]
+    )
 
 
 @pytest.fixture
 def schema_pagamentos():
     """Schema para DataFrame de pagamentos."""
-    return StructType([
-        StructField("ID_PEDIDO", StringType(), True),  # Maiúscula para join
-        StructField("forma_pagamento", StringType(), True),
-        StructField("status", BooleanType(), True),
-        StructField("fraude", BooleanType(), True),
-        StructField("score", DoubleType(), True),
-    ])
+    return StructType(
+        [
+            StructField("ID_PEDIDO", StringType(), True),  # Maiúscula para join
+            StructField("forma_pagamento", StringType(), True),
+            StructField("status", BooleanType(), True),
+            StructField("fraude", BooleanType(), True),
+            StructField("score", DoubleType(), True),
+        ]
+    )
 
 
 @pytest.fixture
 def schema_pagamentos_com_struct():
     """Schema para DataFrame de pagamentos com struct de avaliação."""
-    return StructType([
-        StructField("ID_PEDIDO", StringType(), True),  # Maiúscula para join
-        StructField("forma_pagamento", StringType(), True),
-        StructField("status", BooleanType(), True),
-        StructField("avaliacao_fraude", StructType([
-            StructField("fraude", BooleanType(), True),
-            StructField("score", DoubleType(), True),
-        ]), True),
-    ])
+    return StructType(
+        [
+            StructField("ID_PEDIDO", StringType(), True),  # Maiúscula para join
+            StructField("forma_pagamento", StringType(), True),
+            StructField("status", BooleanType(), True),
+            StructField(
+                "avaliacao_fraude",
+                StructType(
+                    [
+                        StructField("fraude", BooleanType(), True),
+                        StructField("score", DoubleType(), True),
+                    ]
+                ),
+                True,
+            ),
+        ]
+    )
 
 
 # ==================== Dados de Teste - Pedidos ====================
@@ -157,8 +167,8 @@ def dados_pagamentos_com_fraude():
     """Dados de pagamentos com indicação de fraude."""
     return [
         ("P001", "credito", False, True, 0.95),  # Com fraude
-        ("P002", "debito", False, False, 0.1),   # Sem fraude
-        ("P003", "pix", True, False, 0.2),       # Status inválido
+        ("P002", "debito", False, False, 0.1),  # Sem fraude
+        ("P003", "pix", True, False, 0.2),  # Status inválido
     ]
 
 
@@ -206,16 +216,9 @@ def df_pagamentos_com_fraude(spark_session, schema_pagamentos, dados_pagamentos_
 
 
 @pytest.fixture
-def df_pagamentos_com_struct(
-    spark_session,
-    schema_pagamentos_com_struct,
-    dados_pagamentos_com_struct
-):
+def df_pagamentos_com_struct(spark_session, schema_pagamentos_com_struct, dados_pagamentos_com_struct):
     """DataFrame de pagamentos com struct de fraude."""
-    return spark_session.createDataFrame(
-        dados_pagamentos_com_struct,
-        schema_pagamentos_com_struct
-    )
+    return spark_session.createDataFrame(dados_pagamentos_com_struct, schema_pagamentos_com_struct)
 
 
 # ==================== Helpers ====================
@@ -225,31 +228,26 @@ def df_pagamentos_com_struct(
 def assert_dataframes_equal():
     """
     Fixture helper para comparar DataFrames.
-    
+
     Retorna uma função que compara dois DataFrames e verifica se são iguais.
     """
+
     def _assert_equal(df_resultado: DataFrame, df_esperado: DataFrame):
         """Compara dois DataFrames e levanta AssertionError se diferentes."""
         # Verificar contagem
-        assert df_resultado.count() == df_esperado.count(), \
-            f"Contagem diferente: {df_resultado.count()} vs {df_esperado.count()}"
-        
-        # Verificar colunas
-        assert df_resultado.columns == df_esperado.columns, \
-            f"Colunas diferentes: {df_resultado.columns} vs {df_esperado.columns}"
-        
-        # Verificar conteúdo
-        resultado_coletado = sorted(
-            [row.asDict() for row in df_resultado.collect()],
-            key=lambda x: str(x)
-        )
-        esperado_coletado = sorted(
-            [row.asDict() for row in df_esperado.collect()],
-            key=lambda x: str(x)
-        )
-        
-        assert resultado_coletado == esperado_coletado, \
-            "Conteúdo dos DataFrames é diferente"
-    
-    return _assert_equal
+        assert (
+            df_resultado.count() == df_esperado.count()
+        ), f"Contagem diferente: {df_resultado.count()} vs {df_esperado.count()}"
 
+        # Verificar colunas
+        assert (
+            df_resultado.columns == df_esperado.columns
+        ), f"Colunas diferentes: {df_resultado.columns} vs {df_esperado.columns}"
+
+        # Verificar conteúdo
+        resultado_coletado = sorted([row.asDict() for row in df_resultado.collect()], key=lambda x: str(x))
+        esperado_coletado = sorted([row.asDict() for row in df_esperado.collect()], key=lambda x: str(x))
+
+        assert resultado_coletado == esperado_coletado, "Conteúdo dos DataFrames é diferente"
+
+    return _assert_equal

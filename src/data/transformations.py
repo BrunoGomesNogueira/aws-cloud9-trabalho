@@ -150,20 +150,10 @@ class Transformation:
             ... )
         """
         logger.debug("Realizando join entre pagamentos e pedidos")
-        
-        colunas_selecionadas = [
-            "ID_PEDIDO",
-            "UF",
-            "forma_pagamento",
-            "VALOR_UNITARIO",
-            "DATA_CRIACAO"
-        ]
-        
-        return (
-            df_pagamentos
-            .join(df_pedidos, on="ID_PEDIDO", how="inner")
-            .select(*colunas_selecionadas)
-        )
+
+        colunas_selecionadas = ["ID_PEDIDO", "UF", "forma_pagamento", "VALOR_UNITARIO", "DATA_CRIACAO"]
+
+        return df_pagamentos.join(df_pedidos, on="ID_PEDIDO", how="inner").select(*colunas_selecionadas)
 
     # ==================== Ordenação ====================
 
