@@ -48,7 +48,7 @@ source .venv/bin/activate
 ### 2. Executar o pipeline
 
 ``` bash
-python src/main.py
+spark-submit src/main.py
 ```
 
 ### 3. Arquivos de saída serão gerados em:
